@@ -1,4 +1,4 @@
-python_example
+Python silk module. --- pysilk ---
 ==============
 
 [![Gitter][gitter-badge]][gitter-link]
