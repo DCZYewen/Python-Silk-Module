@@ -57,22 +57,6 @@ Installation
    Note that this requires the user building `python_example` to have registry edition
    rights on the machine, to be able to run the `vcvarsall.bat` script.
 
-CI Examples
------------
-
-There are examples for CI in `.github/workflows`. A simple way to produces
-binary "wheels" for all platforms is illustrated in the "wheels.yml" file,
-using [`cibuildwheel`][]. You can also see a basic recipe for building and
-testing in `pip.yml`, and `conda.yml` has an example of a conda recipe build.
-
-Windows Python 2.7 runtime requirements
-----------------------------
-
-On Windows, the Visual C++ 2015 redistributable packages are a runtime
-requirement for this project if you build for Python 2.7 (newer versions of
-Python include this redistributable). It can be found
-[here](https://www.microsoft.com/en-us/download/details.aspx?id=48145).
-
 
 Building the documentation
 --------------------------
@@ -93,12 +77,5 @@ pybind11 is provided under a BSD-style license that can be found in the LICENSE
 file. By using, distributing, or contributing to this project, you agree to the
 terms and conditions of this license.
 
-Test call
----------
-
-```python
-import python_example
-python_example.add(1, 2)
-```
 
 [`cibuildwheel`]:          https://cibuildwheel.readthedocs.io
