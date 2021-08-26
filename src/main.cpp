@@ -92,3 +92,7 @@ PYBIND11_MODULE(pysilk, m) {
     m.attr("__version__") = "dev";
 #endif
 }
+
+/*
+Legal issues and opensource licenses see LICENSE file.
+*/
