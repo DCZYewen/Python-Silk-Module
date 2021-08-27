@@ -139,3 +139,9 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+
+# Test files
+*.pcm
+*.exe
+.vscode/

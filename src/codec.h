@@ -11,7 +11,7 @@
 #endif //move this up ahead to avoid C2375
 
 // Codec callback function
-typedef void (cb_codec)(void* userdata, unsigned char* p, int len);
+typedef void* (cb_codec)(void* userdata, unsigned char* p, int len);
 
 /**
  * Decode SILK data to PCM

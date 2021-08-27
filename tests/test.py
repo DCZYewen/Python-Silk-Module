@@ -1,5 +1,11 @@
 import pysilk as m
 
-assert m.__version__ == '0.0.1'
-assert m.add(1, 2) == 3
-assert m.subtract(1, 2) == -1
+print(m.__version__)
+
+with open("test.pcm", "rb") as f:
+    result = m.silkEncode(f.read(), 24000)
+
+with open("result.slk" , "wb")as f:
+    f.write(result)
+    
+print(result)
