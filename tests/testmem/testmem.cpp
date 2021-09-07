@@ -2,48 +2,48 @@
 #include <cstdio>
 using namespace std;
 #include <cstdlib>
+#include <vector>
 #include <cstring>
-
-struct dataItem
+class dataItem
 {
 public:
     int buffer_size;
     int current_pos;
     unsigned char* data;
-    dataItem(){
-        data = (unsigned char*)malloc(1<<12);
-        buffer_size = 1<<12;
-        current_pos = 0;
-        cout << "excuted" << endl;
+    std::vector<unsigned char> v_data;
+    dataItem() {
     }
-    ~dataItem(){
-        free(data);
+    ~dataItem() {
     }
-    void extendData(int n){
-        printf("Before %p\n" , data);
-        auto ndata = (unsigned char*)malloc(buffer_size + n + (1<<12));
-        printf("data %p ndata %p\n" , data , ndata);
-        memcpy_s(ndata , current_pos , data , current_pos);
-        free(data);
-        data = ndata;
-        printf("After  %p\n" , data);
 
-        buffer_size += (n+(1<<12));
+    void writeData(void* p, int len) {
+        for (int i = 0; i < len; i++){
+            v_data.push_back( ((unsigned char*)p)[i] );
+        }
+        return;
     }
 
     friend std::ostream& operator<<(std::ostream& os, const dataItem& di);
-};    
+};
 
-std::ostream& operator<<(std::ostream& os , const dataItem& di){
-    os << "Buffer Size:" << di.buffer_size << " Current Pos:" << di.current_pos<<
-    " Data Pointer:" << reinterpret_cast<const void *>(di.data);
+std::ostream& operator<<(std::ostream& os, const dataItem& di) {
+    os << "Buffer Size:" << di.buffer_size << " Current Pos:" << di.current_pos <<
+        " Data Pointer:" << reinterpret_cast<const void*>(di.data);
     return os;
 };
 
-int main(void){
+int main(void) {
     dataItem di = dataItem();
-    for (int i = 0 ; i < 100 ; i++){
-        di.extendData(200);
+    char* p = (char*)malloc(sizeof(char) * 4096);
+    srand(123213);
+    for (int i = 0; i < 4096 / sizeof(int); i++) {
+        auto t = (int*)p;
+        t[i] = rand();
+    }
+    for (int i = 0; i < 100; i++) {
+        auto t = rand()%4000;
+        printf("current_eof:%d new random:%d\n", di.current_pos, t);
+        di.writeData(p, t);
         cout << di << endl;
     }
     return 0;
