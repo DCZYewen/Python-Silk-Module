@@ -54,15 +54,15 @@ PYBIND11_MODULE(pysilk, m) {
     m.def("silkDecode",[](py::bytes rdata , int sampleRate){
         std::string s_data(rdata);
         int buf_size = s_data.length()*sizeof(unsigned char);
-        unsigned char* data = (unsigned char*)malloc(buf_size + 1);
+        unsigned char* data = (unsigned char*)malloc(buf_size);
+        memcpy(data , s_data.c_str() , buf_size);
         dataItem di = dataItem();
-        memcpy_s(data , buf_size +1 , s_data.c_str() , buf_size );
         int ret = silkDecode(data , buf_size, sampleRate, codecCallback, (void*)&di);
         free(data);
         if(!ret) {
             char error[1];
             error[0] = '\0';
-            return py::bytes();
+            return py::bytes(error);
         }else{
             auto p = di.v_data.data();
             std::string ret_val( (char *)p , di.v_data.size() );
@@ -78,9 +78,9 @@ PYBIND11_MODULE(pysilk, m) {
     m.def("silkEncode",[](py::bytes rdata , int sampleRate){
         std::string s_data(rdata);
         int buf_size = s_data.length()*sizeof(unsigned char);
-        unsigned char* data = (unsigned char*)malloc(buf_size + 1);
+        unsigned char* data = (unsigned char*)malloc(buf_size);
+        memcpy(data , s_data.c_str() , buf_size);
         dataItem di = dataItem();
-        memcpy_s(data , buf_size +1 , s_data.c_str() , buf_size );
         int ret = silkEncode(data , buf_size, sampleRate, codecCallback, (void*)&di);
         free(data);
         if(!ret) {

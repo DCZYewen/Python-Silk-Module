@@ -143,5 +143,6 @@ cython_debug/
 
 # Test files
 *.pcm
+*.slk
 *.exe
 .vscode/
