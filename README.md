@@ -1,6 +1,20 @@
 Python silk module. --- pysilk ---
 =============
 
+APIs
+------------
+
+See `test\test.py`.
+```
+import pysilk as m
+m.silkEncode(buf , 24000)
+m.silkDecode(buf , 24000)
+#the first param is buffer of data, the second param is sample rate.
+```
+In PyCharm and other IDEs like vscode, the param is supposed to be
+highlighted. And a breif intro in appended.
+
+
 Installation
 ------------
 
