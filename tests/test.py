@@ -7,7 +7,6 @@ with open("test.pcm", "rb") as f:
 
 with open("result.pcm" , "wb")as f:
     n_result = m.silkDecode(result , 24000)
-    print(n_result)
-    f.write(result)
+    f.write(n_result)
     
 print("Done")

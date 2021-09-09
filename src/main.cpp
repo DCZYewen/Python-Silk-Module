@@ -18,7 +18,21 @@ public:
 
     void writeData(void* p, int len) {
         for (int i = 0; i < len; i++){
-            v_data.push_back( ((unsigned char*)p)[i] );
+            v_data.push_back( *((unsigned char*)p + i) );
+        }
+        return;
+    }
+    const void* getData(){
+        const  void *p = v_data.data();
+        return p;
+    }
+    const std::size_t getDataLen(){
+        return v_data.size();
+    }
+
+    const void printVec(){
+        for( auto iter :v_data){
+            printf("%c" , iter);
         }
         return;
     }
@@ -27,7 +41,7 @@ public:
 
 void* codecCallback(void* userdata, unsigned char* p, int len){
     auto ud = (dataItem*)userdata;
-    ud->writeData(userdata , len);
+    ud->writeData(p , len);
     return userdata;
 }//Debug flag: No errors
 
@@ -64,9 +78,8 @@ PYBIND11_MODULE(pysilk, m) {
             error[0] = '\0';
             return py::bytes(error);
         }else{
-            auto p = di.v_data.data();
-            std::string ret_val( (char *)p , di.v_data.size() );
-            return py::bytes(ret_val);
+            //std::string ret_val( (char*)di.getData() , di.getDataLen() );
+            return py::bytes((char*)di.getData() , di.getDataLen());
         }
 
     },py::arg("Stream") , py::arg("SampleRate") , R"pbdoc(
@@ -88,9 +101,7 @@ PYBIND11_MODULE(pysilk, m) {
             error[0] = '\0';
             return py::bytes();
         }else{
-            auto p = di.v_data.data();
-            std::string ret_val( (char *)p , di.v_data.size() );
-            return py::bytes(ret_val);
+            return py::bytes((char*)di.getData() , di.getDataLen());
         }
 
     },py::arg("Stream") , py::arg("SampleRate") , R"pbdoc(
