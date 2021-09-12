@@ -9,6 +9,7 @@ def encode(pcm_data: bytes, sample_rate=24000) -> bytes:
 
 
 def encode_file(pcm_file: Union[str, BinaryIO], sample_rate=24000) -> bytes:
+    # TODO: wav format support
     fd = get_file(pcm_file)
     try:
         return encode(fd.read(), sample_rate)
