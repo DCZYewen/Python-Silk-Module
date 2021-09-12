@@ -1,5 +1,8 @@
-from pysilk import *
+from pysilk import encode, encode_file, decode, decode_file
 
 __all__ = [
-    "pysilk"
+    "encode",
+    "encode_file",
+    "decode",
+    "decode_file"
 ]
