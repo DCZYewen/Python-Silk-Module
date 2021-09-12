@@ -1,4 +1,4 @@
-from pysilk import encode, encode_file, decode, decode_file
+from .pysilk import encode, encode_file, decode, decode_file
 
 __all__ = [
     "encode",
