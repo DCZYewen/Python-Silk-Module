@@ -47,12 +47,12 @@ void* codecCallback(void* userdata, unsigned char* p, int len){
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(pysilk, m) {
+PYBIND11_MODULE(_pysilk, m) {
     m.doc() = R"pbdoc(
         Python silk decode/encoder bindings using pybind11
         -----------------------
 
-        .. currentmodule:: pysilk
+        .. currentmodule:: _pysilk
 
         .. autosummary::
            :toctree: _generate

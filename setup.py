@@ -2,11 +2,8 @@ from setuptools import setup
 
 # Available at setup time due to pyproject.toml
 from pybind11.setup_helpers import Pybind11Extension, build_ext
-from pybind11 import get_cmake_dir
 
-import sys
-
-__version__ = "1.0.3"
+__version__ = "1.1.0"
 
 # The main interface is through Pybind11Extension.
 # * You can add cxx_std=11/14/17, and then build_ext can be removed.
@@ -18,8 +15,8 @@ __version__ = "1.0.3"
 #   reproducible builds (https://github.com/pybind/python_example/pull/53)
 
 ext_modules = [
-    Pybind11Extension("pysilk",
-        ["src/main.cpp","src/codec.cpp",
+    Pybind11Extension("_pysilk",
+        ["src/_pysilk.cpp","src/codec.cpp",
         "src/silk/src/SKP_Silk_A2NLSF.c",
         "src/silk/src/SKP_Silk_ana_filt_bank_1.c",
         "src/silk/src/SKP_Silk_apply_sine_window.c",
