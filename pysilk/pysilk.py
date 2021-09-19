@@ -1,7 +1,15 @@
+import asyncio
+
+from os import cpu_count
 from typing import Union, BinaryIO
+from concurrent.futures import ThreadPoolExecutor
 
 from _pysilk import silkEncode, silkDecode
 from .utils import get_file, is_silk_data
+
+
+_LOOP = asyncio.get_event_loop()
+_EXECUTOR = ThreadPoolExecutor(cpu_count())
 
 
 def encode(pcm_data: bytes, sample_rate=24000) -> bytes:
@@ -30,3 +38,19 @@ def decode_file(silk_file: Union[str, BinaryIO], sample_rate=24000) -> bytes:
         return encode(fd.read(), sample_rate)
     finally:
         fd.close()
+
+
+async def async_encode(pcm_data: bytes, sample_rate=24000) -> bytes:
+    return await _LOOP.run_in_executor(_EXECUTOR, encode, pcm_data, sample_rate)
+
+
+async def async_decode(silk_data: bytes, sample_rate=24000) -> bytes:
+    return await _LOOP.run_in_executor(_EXECUTOR, decode, silk_data, sample_rate)
+
+
+async def async_encode_file(pcm_file: Union[str, BinaryIO], sample_rate=24000) -> bytes:
+    return await _LOOP.run_in_executor(_EXECUTOR, encode_file, pcm_file, sample_rate)
+
+
+async def async_decode_file(silk_file: Union[str, BinaryIO], sample_rate=24000) -> bytes:
+    return await _LOOP.run_in_executor(_EXECUTOR, decode_file, silk_file, sample_rate)
