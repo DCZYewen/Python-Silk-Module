@@ -139,7 +139,7 @@ ext_modules = [
 ]
 
 setup(
-    name="pysilk",
+    name="pysilk-mod",
     version=__version__,
     author="DCZYewen",
     author_email="contact@basicws.net",
