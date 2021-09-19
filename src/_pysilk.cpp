@@ -66,7 +66,7 @@ PYBIND11_MODULE(_pysilk, m) {
     )pbdoc";
 
     m.def("silkDecode",[](py::bytes rdata , int sampleRate){
-        py::gil_scoped_release;
+        py::gil_scoped_release release;
         std::string s_data(rdata);
         int buf_size = s_data.length()*sizeof(unsigned char);
         unsigned char* data = (unsigned char*)malloc(buf_size);
@@ -74,6 +74,7 @@ PYBIND11_MODULE(_pysilk, m) {
         dataItem di = dataItem();
         int ret = silkDecode(data , buf_size, sampleRate, codecCallback, (void*)&di);
         free(data);
+        py::gil_scoped_acquire acquire;
         if(!ret) {
             char error[1];
             error[0] = '\0';
@@ -90,7 +91,7 @@ PYBIND11_MODULE(_pysilk, m) {
     )pbdoc");
 
     m.def("silkEncode",[](py::bytes rdata , int sampleRate){
-        py::gil_scoped_release;
+        py::gil_scoped_release release;
         std::string s_data(rdata);
         int buf_size = s_data.length()*sizeof(unsigned char);
         unsigned char* data = (unsigned char*)malloc(buf_size);
@@ -98,6 +99,7 @@ PYBIND11_MODULE(_pysilk, m) {
         dataItem di = dataItem();
         int ret = silkEncode(data , buf_size, sampleRate, codecCallback, (void*)&di);
         free(data);
+        py::gil_scoped_acquire acquire;
         if(!ret) {
             char error[1];
             error[0] = '\0';
