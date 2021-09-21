@@ -1,11 +1,12 @@
 #include <pybind11/pybind11.h>
-#define NO_ASM
-#include "codec.h"
 #include <cstdlib>
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
 #include <iostream>
-#include <cstdio>
+#include <vector>
+#include <new.h>
+#include "codec.h"
+#include "../ThreadPool/ThreadPool.h"
 
 class dataItem
 {
@@ -47,25 +48,7 @@ void* codecCallback(void* userdata, unsigned char* p, int len){
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(_pysilk, m) {
-    m.doc() = R"pbdoc(
-        Python silk decode/encoder bindings using pybind11
-        -----------------------
-
-        .. currentmodule:: _pysilk
-
-        .. autosummary::
-           :toctree: _generate
-
-        Many thanks to the silk SDK and libSilkCodec.
-        I modified some of the code to make it compatible as python module.
-        License is appended to the LICENSE file of the github repo.
-
-        Author:  DCZYewen
-        Contact: contact@basicws.net
-    )pbdoc";
-
-    m.def("silkDecode",[](py::bytes rdata , int sampleRate){
+auto Decode_Lambda = [](py::bytes rdata , int sampleRate){
         py::gil_scoped_release release;
         std::string s_data(rdata);
         int buf_size = s_data.length()*sizeof(unsigned char);
@@ -84,13 +67,9 @@ PYBIND11_MODULE(_pysilk, m) {
             return py::bytes((char*)di.getData() , di.getDataLen());
         }
 
-    },py::arg("Stream") , py::arg("SampleRate") , R"pbdoc(
-        To call this function, the first param should be a bytes, which
-        refers to the data stream to be Decoded. The second should be
-        the samplerate of demand.
-    )pbdoc");
+    };
 
-    m.def("silkEncode",[](py::bytes rdata , int sampleRate){
+auto Encode_Lambda = [](py::bytes rdata , int sampleRate){
         py::gil_scoped_release release;
         std::string s_data(rdata);
         int buf_size = s_data.length()*sizeof(unsigned char);
@@ -108,7 +87,80 @@ PYBIND11_MODULE(_pysilk, m) {
             return py::bytes((char*)di.getData() , di.getDataLen());
         }
 
-    },py::arg("Stream") , py::arg("SampleRate") , R"pbdoc(
+    };
+
+PYBIND11_MODULE(_pysilk, m) {
+    m.doc() = R"pbdoc(
+        Python silk decode/encoder bindings using pybind11
+        -----------------------
+
+        .. currentmodule:: _pysilk
+
+        .. autosummary::
+           :toctree: _generate
+
+        Many thanks to the silk SDK and libSilkCodec.
+        I modified some of the code to make it compatible as python module.
+        License is appended to the LICENSE file of the github repo.
+
+        Author:  DCZYewen
+        Contact: contact@basicws.net
+    )pbdoc";
+    std::size_t threads;
+    ThreadPool* pool = (ThreadPool*)malloc(sizeof(ThreadPool));
+
+    m.def("silkAsyncConf", [&threads , &pool](int t_count){
+    //capture variables to configure the library.
+        threads = t_count;
+        new(pool)ThreadPool(threads);//placement new
+        return 0;
+    } , py::arg("Configures threads in thread pool."), R"pbdoc(
+        Call this fuction to configure the threads
+        quantity used in the internal thread pool.
+    )pbdoc");
+
+    m.def("silkAsyncTerminate", [&pool](){
+        pool->~ThreadPool();
+        free(pool);
+        return 0;
+    } , R"pbdoc(
+        Call this function to destruct everyting,
+        if any async call is performed, the program
+        will crash.
+    )pbdoc");
+
+    m.def("silkAsyncEncode", [&pool](py::bytes rdata , int sampleRate){
+        py::gil_scoped_release release;
+        auto result = pool->enqueue(Encode_Lambda(rdata , sampleRate));
+        auto p_res = &result;
+        py::gil_scoped_acquire acquire;
+        return py::bytes((char*)p_res , sizeof(p_res));
+    });
+
+    m.def("silkAsnycDecode", [&pool](py::bytes rdata , int sampleRate){
+        py::gil_scoped_release release;
+        auto result = pool->enqueue(Decode_Lambda(rdata , sampleRate));
+        auto p_res = &result;
+        py::gil_scoped_acquire acquire;
+        return py::bytes((char*)p_res , sizeof(p_res));
+    });
+
+    m.def("waitResult", [&pool](py::bytes result){
+        std::string s_data(result);
+        char* buf = (char*)malloc(sizeof(char) * s_data.length());
+        memcpy_s(buf , sizeof(char) * s_data.length(),
+        s_data.c_str() , sizeof(char) * s_data.length());
+        auto p_res = (std::future<pybind11::object>*) buf;
+        return p_res->get();
+    });
+
+    m.def("silkDecode", Decode_Lambda ,py::arg("Stream") , py::arg("SampleRate") , R"pbdoc(
+        To call this function, the first param should be a bytes, which
+        refers to the data stream to be Decoded. The second should be
+        the samplerate of demand.
+    )pbdoc");
+
+    m.def("silkEncode", Encode_Lambda ,py::arg("Stream") , py::arg("SampleRate") , R"pbdoc(
         To call this function, the first param should be a bytes, which
         refers to the data stream to be Decoded. The second should be
         the samplerate of demand.
