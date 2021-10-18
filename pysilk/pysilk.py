@@ -35,7 +35,7 @@ def decode(silk_data: bytes, sample_rate=24000) -> bytes:
 def decode_file(silk_file: Union[str, BinaryIO], sample_rate=24000) -> bytes:
     fd = get_file(silk_file)
     try:
-        return encode(fd.read(), sample_rate)
+        return decode(fd.read(), sample_rate)
     finally:
         fd.close()
 
