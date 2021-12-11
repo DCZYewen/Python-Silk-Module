@@ -1,8 +1,8 @@
 #ifndef _CODEC_H_
 #define _CODEC_H_
 
-#include "silk/interface/SKP_Silk_SDK_API.h"
-#include "silk/src/SKP_Silk_SigProc_FIX.h"
+#include "SKP_Silk_SDK_API.h"
+#include "src/SKP_Silk_SigProc_FIX.h"
 
 #ifdef _WIN32
 #define __dllexport __declspec(dllexport)

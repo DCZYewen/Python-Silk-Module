@@ -1,21 +1,13 @@
 import glob
 
-from setuptools import setup, find_packages
+from setuptools import setup
 # Available at setup time due to pyproject.toml
 try:
     from pybind11.setup_helpers import Pybind11Extension as Extension
 except ImportError:
     from setuptools import Extension
 
-__version__ = "1.2.1"
-
-ext_modules = [
-    Extension(
-        "_pysilk", ["src/_pysilk.cpp", "src/codec.cpp", *glob.glob("src/silk/src/*.c")],
-        include_dirs=["src/silk/interface"],
-        define_macros=[('VERSION_INFO', __version__)]
-    )
-]
+__version__ = "1.2.2"
 
 setup(
     name="pysilk-mod",
@@ -25,8 +17,14 @@ setup(
     url="https://github.com/DCZYewen/Python-Silk-Module",
     description="Python silk decode/encoder",
     long_description="Python silk decode/encoder bindings using pybind11",
-    packages=find_packages(),
+    packages=["src/pysilk"],
     requires=["pybind11"],
-    ext_modules=ext_modules,
-    zip_safe=False
+    zip_safe=False,
+    ext_modules=[
+        Extension(
+            "_pysilk", ["src/silk/_pysilk.cpp", "src/silk/codec.cpp", *glob.glob("src/silk/src/*.c")],
+            include_dirs=["src/silk/interface"],
+            define_macros=[('VERSION_INFO', __version__)]
+        )
+    ]
 )
