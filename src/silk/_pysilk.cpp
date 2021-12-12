@@ -1,6 +1,5 @@
 #include <pybind11/pybind11.h>
 #define NO_ASM
-#include "codec.h"
 #include <cstdlib>
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
