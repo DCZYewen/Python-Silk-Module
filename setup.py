@@ -8,7 +8,7 @@ try:
 except ImportError:
     from setuptools import Extension
 
-__version__ = "1.3.1"
+__version__ = "1.3.2"
 
 setup(
     version=__version__,
@@ -17,7 +17,6 @@ setup(
     ext_modules=[
         Extension(
             "_pysilk", ["src/silk/_pysilk.cpp", "src/silk/codec.cpp", *glob.glob("src/silk/src/*.c")],
-            library_dirs=["src/silk/"],
             include_dirs=["src/silk/interface"],
             define_macros=[('VERSION_INFO', __version__)]
         )
