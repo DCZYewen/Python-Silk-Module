@@ -16,8 +16,8 @@ setup(
     zip_safe=True,
     ext_modules=[
         Extension(
-            "_pysilk", ["src/silk/_pysilk.cpp", "src/silk/codec.cpp"],
-            library_dirs=["src/silk/src/"],
+            "_pysilk", ["src/silk/_pysilk.cpp", "src/silk/codec.cpp", *glob.glob("src/silk/src/*.c")],
+            library_dirs=["src/silk/"],
             include_dirs=["src/silk/interface"],
             define_macros=[('VERSION_INFO', __version__)]
         )
