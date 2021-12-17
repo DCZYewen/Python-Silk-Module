@@ -9,18 +9,32 @@
 name: Upload Python Package
 
 on:
-  release:
-    types: [published]
+  push:
+    branches: [master]
 
 jobs:
+<<<<<<< HEAD
   deploy:
     runs-on: ubuntu-latest
+=======
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+         os: [ubuntu-latest]
+>>>>>>> refs/remotes/origin/master
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
+    
+    - name: Build wheels
+      uses: pypa/cibuildwheel@v2.3.1
+      
+    - uses: actions/upload-artifact@v2
       with:
+<<<<<<< HEAD
         python-version: '3.x'
     - name: Install dependencies
       run: |
@@ -38,3 +52,38 @@ jobs:
       with:
         user: __token__
         password: ${{ secrets.PYPI_API_TOKEN }}
+=======
+        path: ./wheelhouse/*.whl
+      
+  make_sdist:
+    name: Make SDist
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Optional, use if you use setuptools_scm
+          submodules: true  # Optional, use if you have submodules
+      - name: Build SDist
+        run: pipx run build --sdist
+      
+      - uses: actions/upload-artifact@v2
+        with:
+          path: dist/*.tar.gz
+      
+  upload_all:
+    needs: [build_wheels, make_sdist]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: artifact
+          path: dist
+      
+      - name: Publish package
+        uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          skip_existing: true
+          verbose: true
+>>>>>>> refs/remotes/origin/master
