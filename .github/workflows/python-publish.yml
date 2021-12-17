@@ -29,12 +29,9 @@ jobs:
         pip install wheel
         pip install pybind11
     - name: Build package
-      run: |
-        python setup.py build
-        python setup.py sdist
-        python setup.py bdist
-        python setup.py bdist_wheel
-        python setup.py bdist_egg
+      uses: RalfG/python-wheels-manylinux-build@v0.4.2
+      with:
+        python-versions: 'cp36-cp36m cp37-cp37m cp38-cp38m cp39-cp39m'
     - name: Publish package
       uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
       with:
