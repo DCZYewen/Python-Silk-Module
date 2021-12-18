@@ -9,7 +9,7 @@ int sampleRate, cb_codec callback, void* userdata)
   SKP_uint8 payload[MAX_BYTES_PER_FRAME * MAX_INPUT_FRAMES];
   SKP_int16 in[FRAME_LENGTH_MS * MAX_API_FS_KHZ * MAX_INPUT_FRAMES];
   SKP_int32 encSizeBytes, result;
-  unsigned char* psRead = pcmData;
+  unsigned char* psRead = pcmData, *psReadEnd = pcmData + dataLen;;
   void* psEnc = NULL;
 
 #ifdef _SYSTEM_IS_BIG_ENDIAN
@@ -19,7 +19,7 @@ int sampleRate, cb_codec callback, void* userdata)
   /* default settings */
   SKP_int32 API_fs_Hz = sampleRate;
   SKP_int32 max_internal_fs_Hz = 0;
-  SKP_int32 targetRate_bps = 25000;
+  SKP_int32 targetRate_bps = 24000;
   SKP_int32 smplsSinceLastPacket, packetSize_ms = 20;
   SKP_int32 frameSizeReadFromFile_ms = 20;
 
@@ -71,9 +71,17 @@ int sampleRate, cb_codec callback, void* userdata)
 
     /* Read input */
     counter = (frameSizeReadFromFile_ms * API_fs_Hz) / 1000;
+    if (counter > psReadEnd - psRead) {
+      memset(in, 0x00, sizeof(in));
 
-    size_t realrd = counter * sizeof(SKP_int16);
-    memcpy(in, psRead, realrd); psRead += realrd;
+    size_t realrd = (psReadEnd - psRead);
+      memcpy(in, psRead, realrd); psRead += realrd;
+    }
+
+    else {
+      size_t realrd = counter * sizeof(SKP_int16);
+      memcpy(in, psRead, realrd); psRead += realrd;
+    }
 
 #ifdef _SYSTEM_IS_BIG_ENDIAN
     swap_endian(in, counter);
