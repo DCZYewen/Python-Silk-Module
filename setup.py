@@ -9,7 +9,7 @@ try:
 except ImportError:
     from setuptools import Extension
 
-__version__ = "1.3.2"
+__version__ = "1.3.3"
 
 
 class PyTest(tester):
