@@ -5,7 +5,7 @@ from wave import Wave_read
 from utils import local_file, get_loop
 
 SILK_PATH = local_file("target.silk")
-EXPECT_DATA = b"\x00\x00"*64
+EXPECT_DATA = open(local_file("output.pcm"), "rb").read()
 LOOP = get_loop()
 
 
