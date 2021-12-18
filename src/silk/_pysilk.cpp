@@ -76,9 +76,7 @@ PYBIND11_MODULE(_pysilk, m) {
         free(data);
         py::gil_scoped_acquire acquire;
         if(!ret) {
-            char error[1];
-            error[0] = '\0';
-            return py::bytes(error);
+            return py::bytes(0);
         }else{
             //std::string ret_val( (char*)di.getData() , di.getDataLen() );
             return py::bytes((char*)di.getData() , di.getDataLen());
@@ -101,9 +99,7 @@ PYBIND11_MODULE(_pysilk, m) {
         free(data);
         py::gil_scoped_acquire acquire;
         if(!ret) {
-            char error[1];
-            error[0] = '\0';
-            return py::bytes();
+            return py::bytes(0);
         }else{
             return py::bytes((char*)di.getData() , di.getDataLen());
         }
@@ -111,7 +107,7 @@ PYBIND11_MODULE(_pysilk, m) {
     },py::arg("Stream") , py::arg("SampleRate") , R"pbdoc(
         To call this function, the first param should be a bytes, which
         refers to the data stream to be Decoded. The second should be
-        the samplerate of demand.
+        the sample_rate of demand.
     )pbdoc");
 
 #ifdef VERSION_INFO
