@@ -8,10 +8,10 @@
 #define __dllexport __declspec(dllexport)
 #else
 #define __dllexport
-#endif //move this up ahead to avoid C2375
+#endif //_WIN32
 
 // Codec callback function
-typedef void* (cb_codec)(void* userdata, unsigned char* p, int len);
+typedef void *(cb_codec)(void *userdata, unsigned char *p, int len);
 
 /**
  * Decode SILK data to PCM
@@ -28,7 +28,7 @@ typedef void* (cb_codec)(void* userdata, unsigned char* p, int len);
  *
  * @return 1 = success, 0 = failed
  */
-int __dllexport silkDecode(unsigned char* silkData, int dataLen, int sampleRate, cb_codec callback, void* userdata);
+int __dllexport silkDecode(unsigned char *silkData, int dataLen, int sampleRate, cb_codec callback, void *userdata);
 
 /**
  * Encode PCM data to SILK
@@ -45,7 +45,7 @@ int __dllexport silkDecode(unsigned char* silkData, int dataLen, int sampleRate,
  *
  * @return 1 = success, 0 = failed
  */
-int __dllexport silkEncode(unsigned char* pcmData, int dataLen, int sampleRate, cb_codec callback, void* userdata);
+int __dllexport silkEncode(unsigned char *pcmData, int dataLen, int sampleRate, cb_codec callback, void *userdata);
 
 
 #define _CRT_SECURE_NO_WARNINGS

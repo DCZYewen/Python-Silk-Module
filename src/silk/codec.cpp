@@ -1,266 +1,263 @@
 #include "codec.h"
 
 int __dllexport
-silkEncode(unsigned char* pcmData, int dataLen,
-int sampleRate, cb_codec callback, void* userdata)
-{
-  size_t    counter;
-  SKP_int16 nBytes;
-  SKP_uint8 payload[MAX_BYTES_PER_FRAME * MAX_INPUT_FRAMES];
-  SKP_int16 in[FRAME_LENGTH_MS * MAX_API_FS_KHZ * MAX_INPUT_FRAMES];
-  SKP_int32 encSizeBytes, result;
-  unsigned char* psRead = pcmData, *psReadEnd = pcmData + dataLen;;
-  void* psEnc = NULL;
+silkEncode(unsigned char *pcmData, int dataLen,
+           int sampleRate, cb_codec callback, void *userdata) {
+    size_t counter;
+    SKP_int16 nBytes;
+    SKP_uint8 payload[MAX_BYTES_PER_FRAME * MAX_INPUT_FRAMES];
+    SKP_int16 in[FRAME_LENGTH_MS * MAX_API_FS_KHZ * MAX_INPUT_FRAMES];
+    SKP_int32 encSizeBytes, result;
+    unsigned char *psRead = pcmData, *psReadEnd = pcmData + dataLen;
+    void *psEnc = NULL;
 
 #ifdef _SYSTEM_IS_BIG_ENDIAN
-  SKP_int16 nBytes_LE;
+    SKP_int16 nBytes_LE;
 #endif
 
-  /* default settings */
-  SKP_int32 API_fs_Hz = sampleRate;
-  SKP_int32 max_internal_fs_Hz = 0;
-  SKP_int32 targetRate_bps = 24000;
-  SKP_int32 smplsSinceLastPacket, packetSize_ms = 20;
-  SKP_int32 frameSizeReadFromFile_ms = 20;
+    /* default settings */
+    SKP_int32 API_fs_Hz = sampleRate;
+    SKP_int32 max_internal_fs_Hz = 0;
+    SKP_int32 targetRate_bps = 24000;
+    SKP_int32 smplsSinceLastPacket, packetSize_ms = 20;
+    SKP_int32 frameSizeReadFromFile_ms = 20;
 
-  if (max_internal_fs_Hz == 0) {
-    max_internal_fs_Hz = 24000;
-    if (API_fs_Hz < max_internal_fs_Hz) {
-      max_internal_fs_Hz = API_fs_Hz;
+    if (max_internal_fs_Hz == 0) {
+        max_internal_fs_Hz = 24000;
+        if (API_fs_Hz < max_internal_fs_Hz) {
+            max_internal_fs_Hz = API_fs_Hz;
+        }
     }
-  }
 
 #if LOW_COMPLEXITY_ONLY
-  SKP_int32 complexity_mode = 0;
+        SKP_int32 complexity_mode = 0;
 #else
-  SKP_int32 complexity_mode = 2;
+    SKP_int32 complexity_mode = 2;
 #endif
 
-  SKP_SILK_SDK_EncControlStruct encStatus = { 0 }; // Struct for status of encoder
-  SKP_SILK_SDK_EncControlStruct encControl = { 0 }; // Struct for input to encoder
-  encControl.API_sampleRate = sampleRate;
-  encControl.maxInternalSampleRate = max_internal_fs_Hz;
-  encControl.packetSize = (packetSize_ms * sampleRate) / 1000;
-  encControl.packetLossPercentage = 0;
-  encControl.useInBandFEC = 0;
-  encControl.useDTX = 0;
-  encControl.complexity = complexity_mode;
-  encControl.bitRate = (targetRate_bps > 0 ? targetRate_bps : 0);
+    SKP_SILK_SDK_EncControlStruct encStatus = {0}; // Struct for status of encoder
+    SKP_SILK_SDK_EncControlStruct encControl = {0}; // Struct for input to encoder
+    encControl.API_sampleRate = sampleRate;
+    encControl.maxInternalSampleRate = max_internal_fs_Hz;
+    encControl.packetSize = (packetSize_ms * sampleRate) / 1000;
+    encControl.packetLossPercentage = 0;
+    encControl.useInBandFEC = 0;
+    encControl.useDTX = 0;
+    encControl.complexity = complexity_mode;
+    encControl.bitRate = (targetRate_bps > 0 ? targetRate_bps : 0);
 
-  if (API_fs_Hz > MAX_API_FS_KHZ * 1000 || API_fs_Hz < 0)
-    goto failed;
+    if (API_fs_Hz > MAX_API_FS_KHZ * 1000 || API_fs_Hz < 0)
+        goto failed;
 
-  /* Add Silk header to stream */
-  callback(userdata, (unsigned char*)"\x02#!SILK_V3", sizeof(char) * 10);
+    /* Add Silk header to stream */
+    callback(userdata, (unsigned char *) "\x02#!SILK_V3", sizeof(char) * 10);
 
-  /* Create Encoder */
-  result = SKP_Silk_SDK_Get_Encoder_Size(&encSizeBytes);
-  if (result) goto failed;
+    /* Create Encoder */
+    result = SKP_Silk_SDK_Get_Encoder_Size(&encSizeBytes);
+    if (result) goto failed;
 
-  /* Reset Encoder */
-  psEnc = malloc(encSizeBytes);
-  result = SKP_Silk_SDK_InitEncoder(psEnc, &encStatus);
-  if (result) goto failed;
+    /* Reset Encoder */
+    psEnc = malloc(encSizeBytes);
+    result = SKP_Silk_SDK_InitEncoder(psEnc, &encStatus);
+    if (result) goto failed;
 
-  smplsSinceLastPacket = 0;
+    smplsSinceLastPacket = 0;
 
-  while (1) {
+    while (1) {
 
-    if (psRead - pcmData >= dataLen)
-      break;
+        if (psRead - pcmData >= dataLen)
+            break;
 
-    /* Read input */
-    counter = (frameSizeReadFromFile_ms * API_fs_Hz) / 1000;
-    if (counter > psReadEnd - psRead) {
-      memset(in, 0x00, sizeof(in));
+        /* Read input */
+        counter = (frameSizeReadFromFile_ms * API_fs_Hz) / 1000;
+        if (counter > psReadEnd - psRead) {
+            memset(in, 0x00, sizeof(in));
 
-    size_t realrd = (psReadEnd - psRead);
-      memcpy(in, psRead, realrd); psRead += realrd;
-    }
-
-    else {
-      size_t realrd = counter * sizeof(SKP_int16);
-      memcpy(in, psRead, realrd); psRead += realrd;
-    }
+            size_t realrd = (psReadEnd - psRead);
+            memcpy(in, psRead, realrd);
+            psRead += realrd;
+        } else {
+            size_t realrd = counter * sizeof(SKP_int16);
+            memcpy(in, psRead, realrd);
+            psRead += realrd;
+        }
 
 #ifdef _SYSTEM_IS_BIG_ENDIAN
-    swap_endian(in, counter);
+        swap_endian(in, counter);
 #endif
 
-    /* max payload size */
-    nBytes = MAX_BYTES_PER_FRAME * MAX_INPUT_FRAMES;
+        /* max payload size */
+        nBytes = MAX_BYTES_PER_FRAME * MAX_INPUT_FRAMES;
 
-    /* Silk Encoder */
-    SKP_Silk_SDK_Encode(psEnc, &encControl, in, (SKP_int16)counter, payload, &nBytes);
+        /* Silk Encoder */
+        SKP_Silk_SDK_Encode(psEnc, &encControl, in, (SKP_int16) counter, payload, &nBytes);
 
-    /* Get packet size */
-    packetSize_ms = (SKP_int)((1000 * (SKP_int32)encControl.packetSize) / encControl.API_sampleRate);
+        /* Get packet size */
+        packetSize_ms = (SKP_int) ((1000 * (SKP_int32) encControl.packetSize) / encControl.API_sampleRate);
 
-    smplsSinceLastPacket += (SKP_int)counter;
-    if (((1000 * smplsSinceLastPacket) / API_fs_Hz) == packetSize_ms) {
+        smplsSinceLastPacket += (SKP_int) counter;
+        if (((1000 * smplsSinceLastPacket) / API_fs_Hz) == packetSize_ms) {
 
-      /* Write payload size */
+            /* Write payload size */
 #ifdef _SYSTEM_IS_BIG_ENDIAN
-      nBytes_LE = nBytes;
-      swap_endian(&nBytes_LE, 1);
-      callback(userdata, (unsigned char*)&nBytes_LE, sizeof(SKP_int16));
+            nBytes_LE = nBytes;
+            swap_endian(&nBytes_LE, 1);
+            callback(userdata, (unsigned char*)&nBytes_LE, sizeof(SKP_int16));
 #else
-      callback(userdata, (unsigned char*)&nBytes, sizeof(SKP_int16));
+            callback(userdata, (unsigned char *) &nBytes, sizeof(SKP_int16));
 #endif
-      /* Write payload */
-      callback(userdata, payload, sizeof(SKP_uint8) * nBytes);
+            /* Write payload */
+            callback(userdata, payload, sizeof(SKP_uint8) * nBytes);
 
-      smplsSinceLastPacket = 0;
+            smplsSinceLastPacket = 0;
+        }
     }
-  }
 
-  free(psEnc);
-  return 1;
+    free(psEnc);
+    return 1;
 
-failed:
-  if (psEnc) free(psEnc);
-  return 0;
+    failed:
+    if (psEnc) free(psEnc);
+    return 0;
 }
 
 int __dllexport
-silkDecode(unsigned char* silkData, int dataLen,
-int sampleRate, cb_codec callback, void* userdata)
-{
-  SKP_uint8 payload[MAX_BYTES_PER_FRAME * MAX_INPUT_FRAMES * (MAX_LBRR_DELAY + 1)];
-  SKP_uint8* payloadEnd = NULL, * payloadToDec = NULL;
-  SKP_int16 nBytesPerPacket[MAX_LBRR_DELAY + 1];
-  SKP_int16 out[((FRAME_LENGTH_MS * MAX_API_FS_KHZ) << 1) * MAX_INPUT_FRAMES], * outPtr;
-  SKP_int32 remainPackets = 0;
-  SKP_int16 len, nBytes, totalLen = 0;
-  SKP_int32 decSizeBytes, result;
-  unsigned char* psRead = silkData;
-  void* psDec = NULL;
+silkDecode(unsigned char *silkData, int dataLen,
+           int sampleRate, cb_codec callback, void *userdata) {
+    SKP_uint8 payload[MAX_BYTES_PER_FRAME * MAX_INPUT_FRAMES * (MAX_LBRR_DELAY + 1)];
+    SKP_uint8 *payloadEnd = NULL, *payloadToDec = NULL;
+    SKP_int16 nBytesPerPacket[MAX_LBRR_DELAY + 1];
+    SKP_int16 out[((FRAME_LENGTH_MS * MAX_API_FS_KHZ) << 1) * MAX_INPUT_FRAMES], *outPtr;
+    SKP_int32 remainPackets = 0;
+    SKP_int16 len, nBytes, totalLen = 0;
+    SKP_int32 decSizeBytes, result;
+    unsigned char *psRead = silkData;
+    void *psDec = NULL;
 
-  SKP_SILK_SDK_DecControlStruct DecControl;
+    SKP_SILK_SDK_DecControlStruct DecControl;
 
-  /* Check Silk header */
-  if (strncmp((char*)psRead, "\x02#!SILK_V3", 0x0A) != 0)
-  goto failed;
-  
-  psRead += 0x0A;
+    /* Check Silk header */
+    if (strncmp((char *) psRead, "\x02#!SILK_V3", 0x0A) != 0)
+        goto failed;
 
-  /* Create decoder */
-  result = SKP_Silk_SDK_Get_Decoder_Size(&decSizeBytes);
-  if (result) goto failed;
+    psRead += 0x0A;
 
-  /* Reset decoder */
-  psDec = malloc(decSizeBytes);
-  result = SKP_Silk_SDK_InitDecoder(psDec);
-  if (result) goto failed;
+    /* Create decoder */
+    result = SKP_Silk_SDK_Get_Decoder_Size(&decSizeBytes);
+    if (result) goto failed;
 
-  payloadEnd = payload;
-  DecControl.framesPerPacket = 1;
-  DecControl.API_sampleRate = sampleRate;
+    /* Reset decoder */
+    psDec = malloc(decSizeBytes);
+    result = SKP_Silk_SDK_InitDecoder(psDec);
+    if (result) goto failed;
 
-  /* Simulate the jitter buffer holding MAX_FEC_DELAY packets */
-  {
-    for (int i = 0; i < MAX_LBRR_DELAY; i++) {
+    payloadEnd = payload;
+    DecControl.framesPerPacket = 1;
+    DecControl.API_sampleRate = sampleRate;
 
-      /* Read payload size */
-      nBytes = *(SKP_int16*)psRead;
-      psRead += sizeof(SKP_int16);
+    /* Simulate the jitter buffer holding MAX_FEC_DELAY packets */
+    {
+        for (int i = 0; i < MAX_LBRR_DELAY; i++) {
 
-#ifdef _SYSTEM_IS_BIG_ENDIAN
-      swap_endian(&nBytes, 1);
-#endif
-
-      /* Read payload */
-      memcpy(payloadEnd, (SKP_uint8*)psRead, nBytes);
-      psRead += sizeof(SKP_uint8) * nBytes;
-
-      nBytesPerPacket[i] = nBytes;
-      payloadEnd += nBytes;
-    }
-
-    nBytesPerPacket[MAX_LBRR_DELAY] = 0;
-  }
-
-  while (1) {
-
-    if (remainPackets == 0) {
-
-      /* Read payload size */
-      nBytes = *(SKP_int16*)psRead;
-      psRead += sizeof(SKP_int16);
+            /* Read payload size */
+            nBytes = *(SKP_int16 *) psRead;
+            psRead += sizeof(SKP_int16);
 
 #ifdef _SYSTEM_IS_BIG_ENDIAN
-      swap_endian(&nBytes, 1);
+            swap_endian(&nBytes, 1);
 #endif
 
-      if (nBytes < 0 || psRead - silkData >= dataLen) {
-        remainPackets = MAX_LBRR_DELAY;
-        goto decode;
+            /* Read payload */
+            memcpy(payloadEnd, (SKP_uint8 *) psRead, nBytes);
+            psRead += sizeof(SKP_uint8) * nBytes;
+
+            nBytesPerPacket[i] = nBytes;
+            payloadEnd += nBytes;
+        }
+
+        nBytesPerPacket[MAX_LBRR_DELAY] = 0;
     }
 
-      /* Read payload */
-      memcpy(payloadEnd, (SKP_uint8*)psRead, nBytes);
-      psRead += sizeof(SKP_uint8) * nBytes;
+    while (1) {
 
-  }
-    else if (--remainPackets <= 0) break;
+        if (remainPackets == 0) {
 
-  decode:
-    if (nBytesPerPacket[0] != 0) {
-      nBytes = nBytesPerPacket[0];
-      payloadToDec = payload;
-    }
+            /* Read payload size */
+            nBytes = *(SKP_int16 *) psRead;
+            psRead += sizeof(SKP_int16);
 
-    outPtr = out;
-    totalLen = 0;
-    int frames = 0;
+#ifdef _SYSTEM_IS_BIG_ENDIAN
+            swap_endian(&nBytes, 1);
+#endif
 
-    /* Decode all frames in the packet */
-    do {
-      /* Decode 20 ms */
-      SKP_Silk_SDK_Decode(psDec, &DecControl, 0, payloadToDec, nBytes, outPtr, &len);
+            if (nBytes < 0 || psRead - silkData >= dataLen) {
+                remainPackets = MAX_LBRR_DELAY;
+                goto decode;
+            }
 
-      frames++;
-      outPtr += len;
-      totalLen += len;
+            /* Read payload */
+            memcpy(payloadEnd, (SKP_uint8 *) psRead, nBytes);
+            psRead += sizeof(SKP_uint8) * nBytes;
 
-      if (frames > MAX_INPUT_FRAMES) {
-        /* Hack for corrupt stream that could generate too many frames */
+        } else if (--remainPackets <= 0) break;
+
+        decode:
+        if (nBytesPerPacket[0] != 0) {
+            nBytes = nBytesPerPacket[0];
+            payloadToDec = payload;
+        }
+
         outPtr = out;
         totalLen = 0;
-        frames = 0;
-      }
+        int frames = 0;
 
-      /* Until last 20 ms frame of packet has been decoded */
-    } while (DecControl.moreInternalDecoderFrames);
+        /* Decode all frames in the packet */
+        do {
+            /* Decode 20 ms */
+            SKP_Silk_SDK_Decode(psDec, &DecControl, 0, payloadToDec, nBytes, outPtr, &len);
 
-    /* Write output to file */
+            frames++;
+            outPtr += len;
+            totalLen += len;
+
+            if (frames > MAX_INPUT_FRAMES) {
+                /* Hack for corrupt stream that could generate too many frames */
+                outPtr = out;
+                totalLen = 0;
+                frames = 0;
+            }
+
+            /* Until last 20 ms frame of packet has been decoded */
+        } while (DecControl.moreInternalDecoderFrames);
+
+        /* Write output to file */
 #ifdef _SYSTEM_IS_BIG_ENDIAN
-    swap_endian(out, totalLen);
+        swap_endian(out, totalLen);
 #endif
 
-    callback(userdata, (unsigned char*)out, sizeof(SKP_int16) * totalLen);
+        callback(userdata, (unsigned char *) out, sizeof(SKP_int16) * totalLen);
 
-    /* Update buffer */
-    SKP_int16 totBytes = 0;
-    for (int i = 0; i < MAX_LBRR_DELAY; i++) {
-      totBytes += nBytesPerPacket[i + 1];
+        /* Update buffer */
+        SKP_int16 totBytes = 0;
+        for (int i = 0; i < MAX_LBRR_DELAY; i++) {
+            totBytes += nBytesPerPacket[i + 1];
+        }
+
+        /* Check if the received totBytes is valid */
+        if (totBytes < 0 || totBytes > sizeof(payload))
+            goto failed;
+
+        SKP_memmove(payload, &payload[nBytesPerPacket[0]], totBytes * sizeof(SKP_uint8));
+        payloadEnd -= nBytesPerPacket[0];
+        SKP_memmove(nBytesPerPacket, &nBytesPerPacket[1], MAX_LBRR_DELAY * sizeof(SKP_int16));
     }
 
-    /* Check if the received totBytes is valid */
-    if (totBytes < 0 || totBytes > sizeof(payload))
-      goto failed;
+    free(psDec);
+    return 1;
 
-    SKP_memmove(payload, &payload[nBytesPerPacket[0]], totBytes * sizeof(SKP_uint8));
-    payloadEnd -= nBytesPerPacket[0];
-    SKP_memmove(nBytesPerPacket, &nBytesPerPacket[1], MAX_LBRR_DELAY * sizeof(SKP_int16));
-}
-
-  free(psDec);
-  return 1;
-
-failed:
-  if (psDec) free(psDec);
-  return 0;
+    failed:
+    if (psDec) free(psDec);
+    return 0;
 }
 
 

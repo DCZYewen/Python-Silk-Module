@@ -201,7 +201,7 @@ void SKP_Silk_SDK_search_for_LBRR(
             /* Corrupt stream */
             *nLBRRBytes = 0;
             return;
-        };
+        }
         if( ( sDec.FrameTermination - 1 ) & lost_offset && sDec.FrameTermination > 0 && sDec.nBytesLeft >= 0 ) {
             /* The wanted FEC is present in the packet */
             *nLBRRBytes = sDec.nBytesLeft;
@@ -244,7 +244,7 @@ void SKP_Silk_SDK_get_TOC(
             /* Corrupt stream */
             Silk_TOC->corrupt = 1;
             break;
-        };
+        }
     
         if( sDec.nBytesLeft > 0 && sDec.FrameTermination == SKP_SILK_MORE_FRAMES ) {
             sDec.nFramesDecoded++;

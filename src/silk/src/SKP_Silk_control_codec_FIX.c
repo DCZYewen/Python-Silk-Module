@@ -366,7 +366,7 @@ SKP_INLINE SKP_int SKP_Silk_setup_LBRR_FIX(
     if( psEnc->sCmn.fs_kHz == 8 ) {
         LBRRRate_thres_bps = INBAND_FEC_MIN_RATE_BPS - 9000;
     } else if( psEnc->sCmn.fs_kHz == 12 ) {
-        LBRRRate_thres_bps = INBAND_FEC_MIN_RATE_BPS - 6000;;
+        LBRRRate_thres_bps = INBAND_FEC_MIN_RATE_BPS - 6000;
     } else if( psEnc->sCmn.fs_kHz == 16 ) {
         LBRRRate_thres_bps = INBAND_FEC_MIN_RATE_BPS - 3000;
     } else {
