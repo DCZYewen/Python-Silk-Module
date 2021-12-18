@@ -32,7 +32,7 @@ def encode_file(target: Union[str, BinaryIO], sample_rate=24000) -> bytes:
 
 def decode(silk_data: bytes, sample_rate=24000, to_wav=False) -> bytes:
     if is_silk_data(silk_data):
-        if to_wav:
+        if not to_wav:
             return silkDecode(silk_data, sample_rate)
         else:
             return pcm2wav(
