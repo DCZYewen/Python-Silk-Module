@@ -1,5 +1,8 @@
 # pysilk-mod
 
+[![Upload to pypi](https://github.com/DCZYewen/Python-Silk-Module/actions/workflows/python-publish.yml/badge.svg)](https://github.com/DCZYewen/Python-Silk-Module/actions/workflows/python-publish.yml)
+[![Build test](https://github.com/DCZYewen/Python-Silk-Module/actions/workflows/python-build-test.yml/badge.svg)](https://github.com/DCZYewen/Python-Silk-Module/actions/workflows/python-build-test.yml)
+
 **支持功能**
  - 非阻塞异步处理
  - 完整的silk/pcm转换
