@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 from _pysilk import silkEncode, silkDecode
 from .utils import get_file, is_silk_data
-from .wav import wav2pcm, pcm2wav
+from .wav import Wave
 
 
 _LOOP = asyncio.get_event_loop()
@@ -17,7 +17,7 @@ _EXECUTOR = ThreadPoolExecutor(cpu_count())
 def encode(data: bytes, sample_rate=24000) -> bytes:
     if data[8:12] == b"WAVE":
         return silkEncode(
-            wav2pcm(BytesIO(data)), sample_rate
+            Wave.wav2pcm(BytesIO(data)), sample_rate
         )
     return silkEncode(data, sample_rate)
 
@@ -35,7 +35,7 @@ def decode(silk_data: bytes, sample_rate=24000, to_wav=False) -> bytes:
         if not to_wav:
             return silkDecode(silk_data, sample_rate)
         else:
-            return pcm2wav(
+            return Wave.pcm2wav(
                 BytesIO(silkDecode(silk_data, sample_rate))
             )
     else:
