@@ -5,7 +5,7 @@ from typing import BinaryIO
 
 class Wave:
     @staticmethod
-    def to_wav(obj: BinaryIO, frame_rate=24000, *, ac=1) -> bytes:
+    def pcm2wav(obj: BinaryIO, frame_rate=24000, *, ac=1) -> bytes:
         res = BytesIO()
         with wave.Wave_write(res) as wav:
             wav.setframerate(frame_rate)
