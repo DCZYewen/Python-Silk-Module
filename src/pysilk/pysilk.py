@@ -5,7 +5,7 @@ from io import BytesIO
 from os import cpu_count
 from typing import Union, BinaryIO
 
-from ._coder import silkEncode, silkDecode
+from .coder import silkEncode, silkDecode
 from .utils import get_file, is_silk_data
 from .wav import Wave
 

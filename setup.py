@@ -51,7 +51,7 @@ setup(
     zip_safe=True,
     ext_modules=[
         Extension(
-            "pysilk._coder", get_compile_file_list(),
+            "pysilk.coder", get_compile_file_list(),
             include_dirs=["src/silk/interface"],
             define_macros=[('VERSION_INFO', __version__)]
         )

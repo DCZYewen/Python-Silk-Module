@@ -47,7 +47,7 @@ void* codecCallback(void* userdata, unsigned char* p, int len){
 
 namespace py = pybind11;
 
-PYBIND11_MODULE(_coder, m) {
+PYBIND11_MODULE(coder, m) {
     m.doc() = R"pbdoc(
         Python silk decode/encoder bindings using pybind11
         -----------------------
