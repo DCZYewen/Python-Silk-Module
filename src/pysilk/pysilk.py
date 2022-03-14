@@ -1,16 +1,13 @@
 import asyncio
 import functools
-
-from os import cpu_count
-from io import BytesIO
-from typing import Union, BinaryIO
 from concurrent.futures import ThreadPoolExecutor
+from io import BytesIO
+from os import cpu_count
+from typing import Union, BinaryIO
 
-from ._silk import silkEncode, silkDecode
-
+from ._coder import silkEncode, silkDecode
 from .utils import get_file, is_silk_data
 from .wav import Wave
-
 
 _LOOP = asyncio.get_event_loop()
 _EXECUTOR = ThreadPoolExecutor(cpu_count())
