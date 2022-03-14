@@ -1,4 +1,5 @@
 import glob
+from sys import version_info
 
 from setuptools import setup
 from setuptools.command.test import test as tester
@@ -9,7 +10,11 @@ try:
 except ImportError:
     from setuptools import Extension
 
-__version__ = "1.4.0"
+__version__ = "1.4.1"
+basic_dependency = ["pybind11", "setuptools"]
+
+if version_info.major != 3 or version_info.minor < 6:
+    raise RuntimeError("pysilk only support python 3.6 or newer")
 
 
 class PyTest(tester):
@@ -27,19 +32,26 @@ class PyTest(tester):
     def run_tests(self):
         import pytest
 
-        errno = pytest.main(self.pytest_args)
-        exit(errno)
+        exit(
+            pytest.main(self.pytest_args)
+        )
+
+
+def get_compile_file_list():
+    files = glob.glob("src/silk/src/*.c")
+    files.extend(["src/silk/_pysilk.cpp", "src/silk/codec.cpp"])
+    return files
 
 
 setup(
     version=__version__,
-    install_requires=["pybind11"],
-    tests_require=['pytest'],
+    build_requires=basic_dependency,
+    tests_require=basic_dependency + ["pytest"],
     cmdclass={"test": PyTest},
     zip_safe=True,
     ext_modules=[
         Extension(
-            "_pysilk", ["src/silk/_pysilk.cpp", "src/silk/codec.cpp", *glob.glob("src/silk/src/*.c")],
+            "pysilk._coder", get_compile_file_list(),
             include_dirs=["src/silk/interface"],
             define_macros=[('VERSION_INFO', __version__)]
         )
