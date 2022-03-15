@@ -7,6 +7,7 @@ from setuptools.command.test import test as tester
 # Available at setup time due to pyproject.toml
 try:
     from pybind11.setup_helpers import Pybind11Extension as Extension
+    from custom_build import CustomBuilder
 except ImportError:
     from setuptools import Extension
 
@@ -45,15 +46,16 @@ def get_compile_file_list():
 
 setup(
     version=__version__,
-    build_requires=basic_dependency,
+    requires=basic_dependency,
     tests_require=basic_dependency + ["pytest"],
-    cmdclass={"test": PyTest},
+    cmdclass={"test": PyTest, "build_ext": CustomBuilder},
     zip_safe=True,
     ext_modules=[
         Extension(
             "pysilk.coder", get_compile_file_list(),
             include_dirs=["src/silk/interface"],
-            define_macros=[('VERSION_INFO', __version__)]
+            define_macros=[('VERSION_INFO', __version__)],
+            extra_compile_args=["-std=c++11"]
         )
     ]
 )
