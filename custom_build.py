@@ -2,8 +2,10 @@ from distutils import log
 from distutils.dep_util import newer_group
 from distutils.errors import DistutilsSetupError
 
-from pybind11.setup_helpers import build_ext
-
+try:
+    from pybind11.setup_helpers import build_ext
+except ImportError:
+    from distutils.command.build_ext import build_ext
 
 class CustomBuilder(build_ext):
     def build_extension(self, ext):

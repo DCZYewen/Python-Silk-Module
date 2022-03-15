@@ -11,7 +11,7 @@ try:
 except ImportError:
     from setuptools import Extension
 
-__version__ = "1.4.1"
+__version__ = "1.4.3"
 basic_dependency = ["pybind11", "setuptools"]
 
 if version_info.major != 3 or version_info.minor < 6:
