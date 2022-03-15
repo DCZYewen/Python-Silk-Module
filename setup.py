@@ -25,8 +25,8 @@ if version_info.major != 3 or version_info.minor < 6:
 
 
 class CustomBuilder(build_ext):
-    def build_extension(self, ext):
-        sources = ext.sources
+    def build_extension(self, ext):
+        sources = ext.sources
         if sources is None or not isinstance(sources, (list, tuple)):
             raise DistutilsSetupError(
                 "in 'ext_modules' option (extension '%s'), "
