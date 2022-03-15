@@ -28,10 +28,12 @@ class Wave:
                     else:
                         break
             else:
+                channel_data = bytearray()
                 while True:
                     frame = wav.readframes(1)
                     if frame:
-                        res.write(frame[0])
+                        channel_data.append(frame[0])
                     else:
                         break
+                res.write(channel_data)
         return res.getvalue()
