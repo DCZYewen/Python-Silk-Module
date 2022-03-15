@@ -26,16 +26,15 @@ if version_info.major != 3 or version_info.minor < 6:
 
 class CustomBuilder(build_ext):
     def build_extension(self, ext):
-        sources = ext.sources
-        if sources is None or not isinstance(sources, (list, tuple)):
-            raise DistutilsSetupError(
+        sources = ext.sources
+        if sources is None or not isinstance(sources, (list, tuple)):
+            raise DistutilsSetupError(
                 "in 'ext_modules' option (extension '%s'), "
                 "'sources' must be present and must be "
                 "a list of source filenames" % ext.name)
-        sources = list(sources) 
-
-        ext_path = self.get_ext_fullpath(ext.name)
-        depends = sources + ext.depends
+        sources = list(sources) 
+        ext_path = self.get_ext_fullpath(ext.name)
+        depends = sources + ext.depends
         if not (self.force or newer_group(depends, ext_path, 'newer')):
             log.debug("skipping '%s' extension (up-to-date)", ext.name)
             return
@@ -77,7 +76,7 @@ class CustomBuilder(build_ext):
         c_build_args = []
         for e in extra_args:
             if not e.startswith("-std="):
-                c_build_args.append(e) 
+                c_build_args.append(e) 
 
         objects = self.compiler.compile(sources,
                                         output_dir=self.build_temp,
