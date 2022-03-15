@@ -7,7 +7,6 @@ from setuptools.command.test import test as tester
 from sys import version_info
 
 # Available at setup time due to pyproject.toml
-from custom_build import CustomBuilder
 
 try:
     from pybind11.setup_helpers import Pybind11Extension as Extension
