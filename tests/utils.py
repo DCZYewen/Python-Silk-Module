@@ -1,7 +1,7 @@
-import os
 import asyncio
+import os
 
-ROOT = "asserts"
+ROOT = "assets"
 
 
 def local_file(path: str) -> str:
