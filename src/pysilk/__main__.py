@@ -1,13 +1,15 @@
 import argparse
+import time
 
 from . import encode_file, decode_file
 from .utils import get_file
 from .wav import Wave
 
 parser = argparse.ArgumentParser("pysilk", description="encode/decode your silk file")
-parser.add_argument("-r", "--rate", default=24000, help="set pcm framerate")
-parser.add_argument("input", action="store")
-parser.add_argument("output", action="store")
+parser.add_argument("-sr", "--sample-rate", default=24000, help="set pcm samplerate")
+parser.add_argument("-q", "--quiet", action="store_const", const=bool, default=False, help="reduce console output")
+parser.add_argument("input", action="store", help="input file path")
+parser.add_argument("output", action="store", help="output file path")
 
 
 def get_suffix(path: str):
@@ -20,23 +22,30 @@ def get_suffix(path: str):
         return sp[1]
 
 
+def log(*content_args):
+    if not args.quiet:
+        print(*content_args)
+
+
 if __name__ == '__main__':
+    st = time.time()
     args = parser.parse_args()
-    if get_suffix(args.input) == get_suffix(args.output):
+    i_suffix, o_suffix = get_suffix(args.input), get_suffix(args.output)
+    if i_suffix == o_suffix:
         print("nothing can do.")
-    elif get_suffix(args.input) == "pcm" and not args.rate:
-        raise ValueError("--rate must be set")
+    elif i_suffix == "pcm" and not args.sample_rate:
+        raise ValueError("--sample-rate must be set")
     else:
         with open(args.output, "wb") as f:
             source = args.input
-            if get_suffix(args.input) == "wav" and get_suffix(args.output) == "pcm":
+            if i_suffix == "wav" and o_suffix == "pcm":
                 f.write(Wave.wav2pcm(get_file(source)))
-            elif get_suffix(args.input) == "pcm" and get_suffix(args.output) == "wav":
-                f.write(Wave.pcm2wav(get_file(source), args.rate))
-            elif get_suffix(args.input) in ("pcm", "wav") and get_suffix(args.output) == "silk":
+            elif i_suffix == "pcm" and o_suffix == "wav":
+                f.write(Wave.pcm2wav(get_file(source), args.sample_rate))
+            elif i_suffix in ("pcm", "wav") and o_suffix == "silk":
                 f.write(encode_file(source))
-            elif get_suffix(args.input) == "silk" and get_suffix(args.output) in ("pcm", "wav"):
+            elif i_suffix == "silk" and o_suffix in ("pcm", "wav"):
                 f.write(decode_file(source, to_wav=args.output == "wav"))
             else:
-                print("Unknown operation:", get_suffix(args.input), "to", get_suffix(args.output))
-    print(args)
+                print("Unknown operation:", i_suffix, "to", o_suffix)
+    log(f"done, {round(time.time() - st, 2)}ms used")

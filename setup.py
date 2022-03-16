@@ -2,9 +2,10 @@ import glob
 from distutils import log
 from distutils.dep_util import newer_group
 from distutils.errors import DistutilsSetupError
+from sys import version_info
+
 from setuptools import setup
 from setuptools.command.test import test as tester
-from sys import version_info
 
 # Available at setup time due to pyproject.toml
 
@@ -15,7 +16,7 @@ except ImportError:
     from setuptools import Extension
     from distutils.command.build_ext import build_ext
 
-__version__ = "1.4.3"
+__version__ = "1.5.0"
 basic_dependency = ["pybind11", "setuptools"]
 
 if version_info.major != 3 or version_info.minor < 6:
