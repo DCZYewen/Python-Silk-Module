@@ -70,7 +70,7 @@ silkEncode(unsigned char *pcmData, int dataLen,
 
         /* Read input */
         counter = (frameSizeReadFromFile_ms * API_fs_Hz) / 1000;
-        if (counter > psReadEnd - psRead) {
+        if (counter * sizeof(SKP_int16) > psReadEnd - psRead) {
             memset(in, 0x00, sizeof(in));
 
             size_t realrd = (psReadEnd - psRead);
