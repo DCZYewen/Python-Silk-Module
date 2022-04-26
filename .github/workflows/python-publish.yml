@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Upload Python Package
+name: Publish to pypi
 
 on:
   release:
@@ -17,7 +17,7 @@ jobs:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
          os: [ubuntu-latest, windows-latest, macos-latest]
 
@@ -39,6 +39,7 @@ jobs:
         with:
           fetch-depth: 0  # Optional, use if you use setuptools_scm
           submodules: true  # Optional, use if you have submodules
+
       - name: Build SDist
         run: pipx run build --sdist
       

@@ -4,7 +4,10 @@ from typing import BinaryIO, Union
 
 def is_silk_data(raw: bytes) -> bool:
     if len(raw) > 10:
-        if raw[:10] == b"\x02#!SILK_V3":
+        offset = 0
+        if raw[0] == 2:
+            offset = 1
+        if raw[offset:10] == b"#!SILK_V3":
             return True
     return False
 
