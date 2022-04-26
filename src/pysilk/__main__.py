@@ -48,4 +48,4 @@ if __name__ == '__main__':
                 f.write(decode_file(source, to_wav=args.output == "wav"))
             else:
                 print("Unknown operation:", i_suffix, "to", o_suffix)
-    log(f"done, {round(time.time() - st, 2)}ms used")
+    log(f"done, {round((time.time() - st) * 1000, 2)}ms used")
