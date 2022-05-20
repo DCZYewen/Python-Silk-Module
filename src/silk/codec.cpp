@@ -2,7 +2,7 @@
 
 int __dllexport
 silkEncode(unsigned char *pcmData, int dataLen,
-           int sampleRate, cb_codec callback, void *userdata) {
+           int sampleRate, int dataRate, cb_codec callback, void *userdata) {
     size_t counter;
     SKP_int16 nBytes;
     SKP_uint8 payload[MAX_BYTES_PER_FRAME * MAX_INPUT_FRAMES];
@@ -18,7 +18,7 @@ silkEncode(unsigned char *pcmData, int dataLen,
     /* default settings */
     SKP_int32 API_fs_Hz = sampleRate;
     SKP_int32 max_internal_fs_Hz = 0;
-    SKP_int32 targetRate_bps = 24000;
+    SKP_int32 targetRate_bps = dataRate;
     SKP_int32 smplsSinceLastPacket, packetSize_ms = 20;
     SKP_int32 frameSizeReadFromFile_ms = 20;
 

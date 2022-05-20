@@ -37,7 +37,9 @@ int __dllexport silkDecode(unsigned char *silkData, int dataLen, int sampleRate,
  *
  * @param dataLen data length
  *
- * @param sampleRate target samplerate
+ * @param sampleRate target sampleRate
+ *
+ * @param dataRate target dataRate
  *
  * @param callback codec callback
  *
@@ -45,7 +47,7 @@ int __dllexport silkDecode(unsigned char *silkData, int dataLen, int sampleRate,
  *
  * @return 1 = success, 0 = failed
  */
-int __dllexport silkEncode(unsigned char *pcmData, int dataLen, int sampleRate, cb_codec callback, void *userdata);
+int __dllexport silkEncode(unsigned char *pcmData, int dataLen, int sampleRate, int dataRate, cb_codec callback, void *userdata);
 
 
 #define _CRT_SECURE_NO_WARNINGS

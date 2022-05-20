@@ -65,14 +65,14 @@ PYBIND11_MODULE(coder, m) {
         Contact: contact@basicws.net
     )pbdoc";
 
-    m.def("silkDecode",[](py::bytes rdata , int sampleRate){
+    m.def("silkDecode",[](py::bytes rdata, int sampleRate){
         py::gil_scoped_release release;
         std::string s_data(rdata);
         int buf_size = s_data.length()*sizeof(unsigned char);
         unsigned char* data = (unsigned char*)malloc(buf_size);
         memcpy(data , s_data.c_str() , buf_size);
         dataItem di = dataItem();
-        int ret = silkDecode(data , buf_size, sampleRate, codecCallback, (void*)&di);
+        int ret = silkDecode(data, buf_size, sampleRate, codecCallback, (void*)&di);
         free(data);
         py::gil_scoped_acquire acquire;
         if(!ret) {
@@ -88,23 +88,23 @@ PYBIND11_MODULE(coder, m) {
         the samplerate of demand.
     )pbdoc");
 
-    m.def("silkEncode",[](py::bytes rdata , int sampleRate){
+    m.def("silkEncode",[](py::bytes rdata, int sampleRate, int dataRate){
         py::gil_scoped_release release;
         std::string s_data(rdata);
         int buf_size = s_data.length()*sizeof(unsigned char);
         unsigned char* data = (unsigned char*)malloc(buf_size);
-        memcpy(data , s_data.c_str() , buf_size);
+        memcpy(data, s_data.c_str(), buf_size);
         dataItem di = dataItem();
-        int ret = silkEncode(data , buf_size, sampleRate, codecCallback, (void*)&di);
+        int ret = silkEncode(data, buf_size, sampleRate, dataRate, codecCallback, (void*)&di);
         free(data);
         py::gil_scoped_acquire acquire;
         if(!ret) {
             return py::bytes(0);
         }else{
-            return py::bytes((char*)di.getData() , di.getDataLen());
+            return py::bytes((char*)di.getData(), di.getDataLen());
         }
 
-    },py::arg("Stream") , py::arg("SampleRate") , R"pbdoc(
+    },py::arg("Stream") , py::arg("SampleRate") , py::arg("DataRate") , R"pbdoc(
         To call this function, the first param should be a bytes, which
         refers to the data stream to be Decoded. The second should be
         the sample_rate of demand.
