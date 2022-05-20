@@ -6,7 +6,7 @@
 **支持功能**
  - 非阻塞异步处理
  - 完整的silk/pcm转换
- - 部分支持wav to pcm
+ - 支持wav to pcm
  - 跨平台
 
 # 环境准备
@@ -55,4 +55,8 @@ python3 -m pysilk --sample-rate 24000 input.wav output.pcm
 # pcm/wav转silk时，比特率默认设置为24000
 # 你可以添加-r选项来修改它
 python3 -m pysilk -r 24000 input.wav output.silk
+
+# 额外内容
+# pcm/wav/silk播放器
+python3 -m pysilk -p input.silk
 ```

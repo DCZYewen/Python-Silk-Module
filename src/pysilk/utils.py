@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from typing import BinaryIO, Union
 
@@ -19,3 +20,34 @@ def get_file(file: Union[str, BinaryIO]) -> BinaryIO:
         return file
     else:
         raise TypeError(file)
+
+
+def force_quit():
+    import os
+    import multiprocessing
+    os.kill(multiprocessing.current_process().pid, 15)  # sigterm
+
+
+def _play_sound(source: Union[str, bytes]):
+    import winsound
+    from threading import Thread
+
+    t = Thread(
+        target=winsound.PlaySound,
+        name="PlayerThread",
+        args=(source, winsound.SND_FILENAME if isinstance(source, str) else winsound.SND_MEMORY),
+    )
+    t.start()
+    try:
+        while True:
+            t.join(0.5)
+    except KeyboardInterrupt:
+        print("Interrupt received")
+        force_quit()
+
+
+def play_audio(source: Union[str, bytes]):
+    if sys.platform != "win32":
+        raise RuntimeError("PlaySound only support windows")
+
+    _play_sound(source)
