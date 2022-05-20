@@ -137,8 +137,13 @@ silkDecode(unsigned char *silkData, int dataLen,
     SKP_SILK_SDK_DecControlStruct DecControl;
 
     /* Check Silk header */
-    if (strncmp((char *) psRead, "\x02#!SILK_V3", 0x0A) != 0)
-        goto failed;
+    if (psRead[0] == 0x02) {
+        if (strncmp((char *) psRead, "\x02#!SILK_V3", 0x0A) != 0)
+            goto failed;
+    } else {
+        if (strncmp((char *) psRead, "#!SILK_V3", 0x09) != 0)
+            goto failed;
+    }
 
     psRead += 0x0A;
 
