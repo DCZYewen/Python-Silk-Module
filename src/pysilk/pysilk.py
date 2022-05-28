@@ -1,13 +1,24 @@
 import asyncio
 import functools
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
 from os import cpu_count
 from typing import Union, BinaryIO
 
-from .coder import silkEncode, silkDecode
 from .utils import get_file, is_silk_data
 from .wav import Wave
+
+try:
+    from .coder import silkEncode, silkDecode
+except ImportError:
+    if sys.platform == "win32":
+        raise RuntimeError(
+            "Visual C++ runtime not found\n"
+            "download: https://docs.microsoft.com/zh-CN/cpp/windows/latest-supported-vc-redist"
+        )
+    raise
+
 
 _LOOP = asyncio.get_event_loop()
 _EXECUTOR = ThreadPoolExecutor(cpu_count())
