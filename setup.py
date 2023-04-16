@@ -16,7 +16,7 @@ except ImportError:
     from setuptools import Extension
     from distutils.command.build_ext import build_ext
 
-__version__ = "1.6.0"
+__version__ = "1.6.1"
 basic_dependency = ["pybind11", "setuptools"]
 
 if version_info.major != 3 or version_info.minor < 6:

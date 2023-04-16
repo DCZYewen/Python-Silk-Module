@@ -1,10 +1,11 @@
+import sys
 import asyncio
 import functools
-import sys
-from concurrent.futures import ThreadPoolExecutor
+
 from io import BytesIO
 from os import cpu_count
 from typing import Union, BinaryIO
+from concurrent.futures import ThreadPoolExecutor
 
 from .utils import get_file, is_silk_data
 from .wav import Wave
@@ -15,12 +16,11 @@ except ImportError:
     if sys.platform == "win32":
         raise RuntimeError(
             "Visual C++ runtime not found\n"
-            "download: https://docs.microsoft.com/zh-CN/cpp/windows/latest-supported-vc-redist"
+            "install it to continue: https://docs.microsoft.com/zh-CN/cpp/windows/latest-supported-vc-redist"
         )
     raise
 
 
-_LOOP = asyncio.get_event_loop()
 _EXECUTOR = ThreadPoolExecutor(cpu_count())
 
 
@@ -61,7 +61,7 @@ def decode_file(silk_file: Union[str, BinaryIO], to_wav=False, *, sample_rate=24
 
 
 async def async_encode(data: bytes, data_rate=24000, *, sample_rate=24000) -> bytes:
-    return await _LOOP.run_in_executor(
+    return await asyncio.get_running_loop().run_in_executor(
         _EXECUTOR,
         functools.partial(
             encode,
@@ -73,7 +73,7 @@ async def async_encode(data: bytes, data_rate=24000, *, sample_rate=24000) -> by
 
 
 async def async_decode(silk_data: bytes, to_wav=False, *, sample_rate=24000) -> bytes:
-    return await _LOOP.run_in_executor(
+    return await asyncio.get_running_loop().run_in_executor(
         _EXECUTOR,
         functools.partial(
             decode,
@@ -85,7 +85,7 @@ async def async_decode(silk_data: bytes, to_wav=False, *, sample_rate=24000) -> 
 
 
 async def async_encode_file(target: Union[str, BinaryIO], data_rate=24000, *, sample_rate=24000) -> bytes:
-    return await _LOOP.run_in_executor(
+    return await asyncio.get_running_loop().run_in_executor(
         _EXECUTOR,
         functools.partial(
             encode_file,
@@ -97,7 +97,7 @@ async def async_encode_file(target: Union[str, BinaryIO], data_rate=24000, *, sa
 
 
 async def async_decode_file(silk_file: Union[str, BinaryIO], to_wav=False, *, sample_rate=24000) -> bytes:
-    return await _LOOP.run_in_executor(
+    return await asyncio.get_running_loop().run_in_executor(
         _EXECUTOR,
         functools.partial(
             decode_file,
