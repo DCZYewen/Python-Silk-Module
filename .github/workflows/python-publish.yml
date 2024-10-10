@@ -16,23 +16,37 @@ jobs:
   build_wheels:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    env:
-      CIBW_ARCHS_LINUX: "auto aarch64"
 
     strategy:
       fail-fast: true
       matrix:
-         os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            cibw_archs: "native"
+          - os: ubuntu-latest
+            cibw_archs: "aarch64"
+          - os: windows-latest
+            cibw_archs: "native ARM64"
+          - os: macos-latest
+            cibw_archs: "native arm64"
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Build wheels
-      uses: pypa/cibuildwheel@v2.21.3
-      
-    - uses: actions/upload-artifact@v3
-      with:
-        path: ./wheelhouse/*.whl
+      - name: Set up QEMU
+        if: matrix.cibw_archs == 'aarch64'
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: arm64
+
+      - uses: actions/checkout@v4
+
+      - name: Build wheels
+        uses: pypa/cibuildwheel@v2.21.3
+        env:
+          CIBW_ARCHS: ${{ matrix.cibw_archs }}
+
+      - uses: actions/upload-artifact@v3
+        with:
+          path: ./wheelhouse/*.whl
       
   make_sdist:
     name: Make SDist
