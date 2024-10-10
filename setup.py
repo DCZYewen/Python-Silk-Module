@@ -1,10 +1,10 @@
 import glob
-from distutils import log
-from distutils.dep_util import newer_group
-from distutils.errors import DistutilsSetupError
 from sys import version_info
 
 from setuptools import setup
+from setuptools._distutils._modified import newer_group
+from setuptools._distutils.errors import DistutilsSetupError
+from setuptools._distutils import log
 from setuptools.command.test import test as tester
 
 # Available at setup time due to pyproject.toml
@@ -14,7 +14,7 @@ try:
     from pybind11.setup_helpers import build_ext
 except ImportError:
     from setuptools import Extension
-    from distutils.command.build_ext import build_ext
+    from setuptools.command.build_ext import build_ext
 
 __version__ = "1.6.2"
 basic_dependency = ["pybind11", "setuptools"]
