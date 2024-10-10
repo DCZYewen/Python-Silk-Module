@@ -9,4 +9,4 @@ def local_file(path: str) -> str:
 
 
 def get_loop() -> asyncio.AbstractEventLoop:
-    return asyncio.get_event_loop()
+    return asyncio.new_event_loop()

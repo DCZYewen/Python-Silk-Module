@@ -26,7 +26,9 @@ async def async_encode(path: str):
     from pysilk.utils import is_silk_data
 
     with open(path, "rb") as f:
-        assert is_silk_data(await async_encode(f.read()))
+        data = await async_encode(f.read())
+        print(data)
+        assert is_silk_data(data)
 
 
 async def async_encode_file(path: str):

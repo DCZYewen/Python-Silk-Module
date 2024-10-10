@@ -16,11 +16,11 @@ except ImportError:
     from setuptools import Extension
     from setuptools.command.build_ext import build_ext
 
-__version__ = "1.6.2"
+__version__ = "1.6.3"
 basic_dependency = ["pybind11", "setuptools"]
 
-if version_info.major != 3 or version_info.minor < 6:
-    raise RuntimeError("pysilk only support python 3.6 or newer")
+if version_info.major != 3 or version_info.minor < 8:
+    raise RuntimeError("pysilk only support python 3.8 or newer")
 
 
 class CustomBuilder(build_ext):

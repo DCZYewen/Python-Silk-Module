@@ -4,7 +4,7 @@ from typing import BinaryIO, Union
 
 
 def is_silk_data(raw: bytes) -> bool:
-    if len(raw) > 10:
+    if len(raw) >= 10:
         offset = 0
         if raw[0] == 2:
             offset = 1
